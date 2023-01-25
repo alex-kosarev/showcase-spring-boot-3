@@ -10,6 +10,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -26,7 +27,8 @@ class TasksRestControllerIT {
     @Test
     void handleGetAllTasks_ReturnsValidResponseEntity() throws Exception {
         // given
-        var requestBuilder = get("/api/tasks");
+        var requestBuilder = get("/api/tasks")
+                .with(httpBasic("user1", "password1"));
 
         // when
         this.mockMvc.perform(requestBuilder)
@@ -56,6 +58,7 @@ class TasksRestControllerIT {
     void handleCreateNewTask_PayloadIsValid_ReturnsValidResponseEntity() throws Exception {
         // given
         var requestBuilder = post("/api/tasks")
+                .with(httpBasic("user2", "password2"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {
@@ -84,6 +87,7 @@ class TasksRestControllerIT {
     void handleCreateNewTask_PayloadIsInvalid_ReturnsValidResponseEntity() throws Exception {
         // given
         var requestBuilder = post("/api/tasks")
+                .with(httpBasic("user1", "password1"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(HttpHeaders.ACCEPT_LANGUAGE, "en")
                 .content("""
